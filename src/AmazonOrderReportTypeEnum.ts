@@ -1,4 +1,4 @@
-export enum AmazonOrderReportType {
+export enum AmazonOrderReportTypeEmum {
   Shipments = "SHIPMENTS",
   Items = "ITEMS"
 }

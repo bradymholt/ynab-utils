@@ -3,20 +3,15 @@ import * as fs from "fs";
 import * as path from "path";
 import * as _ from "lodash";
 
-import {
-  IAmazonOrderInfo,
-  IAmazonItem,
-  IAmazonOrder
-} from "./IAmazonOrderInfo";
-
-import { AmazonOrderReportType } from "./AmazonOrderReportType";
+import { AmazonOrderReportTypeEmum } from "./AmazonOrderReportTypeEnum";
+import { IAmazonOrderItem, IAmazonOrder } from "./IAmazonOrderInfo";
 
 export class AmazonOrderFetcher {
-  username: string;
+  email: string;
   password: string;
 
   constructor(username: string, password: string) {
-    this.username = username;
+    this.email = username;
     this.password = password;
   }
 
@@ -28,31 +23,36 @@ export class AmazonOrderFetcher {
     };
 
     // Setup
-    const browser = await puppeteer.launch({ headless: false });
+    const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
     await page.setUserAgent(userAgent);
     await page.setExtraHTTPHeaders(acceptLanguageHeader);
 
-    // Login
     await this.login(page);
 
-    // Get orders
+    // Get orders and items
     const orders = await this.fetchOrders(page, fromDateISO, toDateISO);
-    const items = await this.fetchItems(page, fromDateISO, toDateISO);
+    const items = await this.fetchOrderItems(page, fromDateISO, toDateISO);
+
     await browser.close();
 
     const ordersById = _.keyBy(orders, "orderId");
-    const itemsByOrder = _.groupBy(items, "orderId");
-    const itemsByOrderCollapsed = _.mapValues(itemsByOrder, i => {
-      return i.map(o => {
-        return o.description;
-      }).join(", ");
-    });
-    const itemsByAmount = _.mapKeys(itemsByOrderCollapsed, (value, key) => {
-      return ordersById[key].amount;
+    const itemsListByOrderId = _.mapValues(_.groupBy(items, "orderId"), i => {
+      return i
+        .map(d => {
+          return d.description;
+        })
+        .join(", ");
     });
 
-    console.log(itemsByAmount);
+    const itemsListByOrderAmount = _.mapKeys(
+      itemsListByOrderId,
+      (value, key) => {
+        return ordersById[key].amount;
+      }
+    );
+
+    return itemsListByOrderAmount;
   }
 
   private async login(page: any) {
@@ -61,7 +61,7 @@ export class AmazonOrderFetcher {
     await page.goto(loginPath);
     await page.click("#nav-signin-tooltip .nav-action-button");
     await page.waitForSelector("#ap_email");
-    await page.type("#ap_email", this.username);
+    await page.type("#ap_email", this.email);
     await page.click(".a-button-input");
     await page.waitForSelector("#ap_password");
     await page.type("#ap_password", this.password);
@@ -70,47 +70,71 @@ export class AmazonOrderFetcher {
   }
 
   private async fetchOrders(page: any, fromDateISO: string, toDateISO: string) {
-    const tmpDir = path.resolve(__dirname, "../tmp");
-    await this.setupReport(
+    const tmpDirectoryPath = path.resolve(__dirname, "../tmp");
+    await this.setupReportParameters(
       page,
       fromDateISO,
       toDateISO,
-      AmazonOrderReportType.Shipments
+      AmazonOrderReportTypeEmum.Shipments
     );
     await page.click("#report-confirm");
-    const fileName = await this.waitForFileToBeCreated(tmpDir);
-    let items = fs.readFileSync(path.resolve(tmpDir, fileName)).toString();
-    let parsed: Array<IAmazonOrder> = items.split("\n").map(a => {
-      let ary = a.split(",");
-      return { orderId: ary[1], amount: ary[ary.length - 3] };
-    });
+    const fileName = await this.waitForFileToBeCreated(tmpDirectoryPath);
+    let items = fs
+      .readFileSync(path.resolve(tmpDirectoryPath, fileName))
+      .toString();
+    let parsedOrders: Array<IAmazonOrder> = items
+      .split("\n")
+      .filter((val, index) => {
+        return index > 0 && val.length > 0;
+      })
+      .map(a => {
+        let ary = a.split(",");
+        return {
+          orderId: ary[1],
+          amount: Number(ary[ary.length - 3].replace(/^\$/, "")).toFixed(2)
+        };
+      });
 
-    return parsed;
+    return parsedOrders;
   }
 
-  private async fetchItems(page: any, fromDateISO: string, toDateISO: string) {
-    const tmpDir = path.resolve(__dirname, "../tmp");
-    await this.setupReport(
+  private async fetchOrderItems(
+    page: any,
+    fromDateISO: string,
+    toDateISO: string
+  ) {
+    const tmpDirectoryPath = path.resolve(__dirname, "../tmp");
+    await this.setupReportParameters(
       page,
       fromDateISO,
       toDateISO,
-      AmazonOrderReportType.Items
+      AmazonOrderReportTypeEmum.Items
     );
     await page.click("#report-confirm");
-    const fileName = await this.waitForFileToBeCreated(tmpDir);
-    let items = fs.readFileSync(path.resolve(tmpDir, fileName)).toString();
-    let parsed: Array<IAmazonItem> = items.split("\n").map(a => {
-      let ary = a.split(",");
-      return { orderId: ary[1], description: ary[2] };
-    });
-    return parsed;
+    const fileName = await this.waitForFileToBeCreated(tmpDirectoryPath);
+    let items = fs
+      .readFileSync(path.resolve(tmpDirectoryPath, fileName))
+      .toString();
+    let parsedOrderItems: Array<IAmazonOrderItem> = items
+      .split("\n")
+      .filter((val, index) => {
+        return index > 0 && val.length > 0;
+      })
+      .map(a => {
+        let ary = a.split(",");
+        return {
+          orderId: ary[1],
+          description: ary[2].replace(/\"/, "")
+        };
+      });
+    return parsedOrderItems;
   }
 
-  private async setupReport(
+  private async setupReportParameters(
     page: any,
     fromDateISO: string,
     toDateISO: string,
-    reportType: AmazonOrderReportType
+    reportType: AmazonOrderReportTypeEmum
   ) {
     const orderReportsPath = "https://www.amazon.com/gp/b2b/reports";
     const fromYear = fromDateISO.substr(0, 4);
@@ -140,20 +164,31 @@ export class AmazonOrderFetcher {
     });
   }
 
-  private async waitForFileToBeCreated(dirPath: string): Promise<string> {
+  /**
+   * Returns a promise that will be resolved once a file has been created in a directory
+   * @param directoryPath
+   * @param timeoutMilliseconds
+   */
+  private async waitForFileToBeCreated(
+    directoryPath: string,
+    timeoutMilliseconds = 10000
+  ): Promise<string> {
     return new Promise<string>((resolve, reject) => {
-      fs.watch(dirPath, (eventType, filename) => {
+      fs.watch(directoryPath, (eventType, filename) => {
         if (!filename.endsWith(".crdownload")) {
           resolve(filename);
         }
       });
       setTimeout(() => {
-        //Timeout after 10 seconds
         reject();
-      }, 10000);
+      }, timeoutMilliseconds);
     });
   }
 
+  /**
+   * Creates a directory if it does exist or deletes all files in a directory if it already exists
+   * @param directoryPath
+   */
   private resetDirectory(directoryPath: string) {
     if (fs.existsSync(directoryPath)) {
       const files = fs.readdirSync(directoryPath);

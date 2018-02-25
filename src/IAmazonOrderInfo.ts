@@ -1,15 +1,9 @@
-export interface IAmazonOrderInfo {
-  orders: Array<IAmazonOrder>;
-  items: Array< IAmazonItem>;
+export interface IAmazonOrder {
+  orderId: string;
+  amount: number;
 }
 
-export interface IAmazonItem {
+export interface IAmazonOrderItem {
   orderId: string;
   description: string;
 }
-
-export interface IAmazonOrder {
-  orderId: string;
-  amount: string;
-}
-
