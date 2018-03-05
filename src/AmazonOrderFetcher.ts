@@ -2,9 +2,12 @@ import * as puppeteer from "puppeteer";
 import * as fs from "fs";
 import * as path from "path";
 import * as _ from "lodash";
+import { IAmazonOrderItem, IAmazonOrder, IAmazonItemsByAmount } from "./amazonOrderInfo";
 
-import { AmazonOrderReportTypeEmum } from "./AmazonOrderReportTypeEnum";
-import { IAmazonOrderItem, IAmazonOrder } from "./IAmazonOrderInfo";
+enum AmazonOrderReportTypeEmum {
+  Shipments = "SHIPMENTS",
+  Items = "ITEMS"
+}
 
 export class AmazonOrderFetcher {
   email: string;
@@ -15,6 +18,11 @@ export class AmazonOrderFetcher {
     this.password = password;
   }
 
+  /**
+   * Runs an order report and returns a list og order items indexed by the order amount
+   * @param fromDateISO
+   * @param toDateISO
+   */
   public async getOrders(fromDateISO: string, toDateISO: string) {
     const userAgent =
       "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.167 Safari/537.36";
@@ -45,7 +53,7 @@ export class AmazonOrderFetcher {
         .join(", ");
     });
 
-    const itemsListByOrderAmount = _.mapKeys(
+    const itemsListByOrderAmount = <IAmazonItemsByAmount>_.mapKeys(
       itemsListByOrderId,
       (value, key) => {
         return ordersById[key].amount;
@@ -69,6 +77,12 @@ export class AmazonOrderFetcher {
     await page.waitFor("#nav-your-amazon");
   }
 
+  /**
+   * Runs order report and returns a list of orders
+   * @param page
+   * @param fromDateISO
+   * @param toDateISO
+   */
   private async fetchOrders(page: any, fromDateISO: string, toDateISO: string) {
     const tmpDirectoryPath = path.resolve(__dirname, "../tmp");
     await this.setupReportParameters(
@@ -77,11 +91,15 @@ export class AmazonOrderFetcher {
       toDateISO,
       AmazonOrderReportTypeEmum.Shipments
     );
+
     await page.click("#report-confirm");
+
     const fileName = await this.waitForFileToBeCreated(tmpDirectoryPath);
+
     let items = fs
       .readFileSync(path.resolve(tmpDirectoryPath, fileName))
       .toString();
+
     let parsedOrders: Array<IAmazonOrder> = items
       .split("\n")
       .filter((val, index) => {
@@ -98,12 +116,19 @@ export class AmazonOrderFetcher {
     return parsedOrders;
   }
 
+  /**
+   * Runs order item report and returns a list of order items
+   * @param page
+   * @param fromDateISO
+   * @param toDateISO
+   */
   private async fetchOrderItems(
     page: any,
     fromDateISO: string,
     toDateISO: string
   ) {
     const tmpDirectoryPath = path.resolve(__dirname, "../tmp");
+
     await this.setupReportParameters(
       page,
       fromDateISO,
@@ -111,10 +136,13 @@ export class AmazonOrderFetcher {
       AmazonOrderReportTypeEmum.Items
     );
     await page.click("#report-confirm");
+
     const fileName = await this.waitForFileToBeCreated(tmpDirectoryPath);
+
     let items = fs
       .readFileSync(path.resolve(tmpDirectoryPath, fileName))
       .toString();
+
     let parsedOrderItems: Array<IAmazonOrderItem> = items
       .split("\n")
       .filter((val, index) => {
@@ -130,6 +158,13 @@ export class AmazonOrderFetcher {
     return parsedOrderItems;
   }
 
+  /**
+   * Navigates to Amazon b2b reports and enters report criteria
+   * @param page
+   * @param fromDateISO
+   * @param toDateISO
+   * @param reportType
+   */
   private async setupReportParameters(
     page: any,
     fromDateISO: string,

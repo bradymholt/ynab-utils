@@ -1,9 +1,13 @@
 export interface IAmazonOrder {
   orderId: string;
-  amount: number;
+  amount: string;
 }
 
 export interface IAmazonOrderItem {
   orderId: string;
   description: string;
+}
+
+export interface IAmazonItemsByAmount {
+  [amount: string]: string
 }
