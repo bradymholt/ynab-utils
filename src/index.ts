@@ -7,14 +7,30 @@ import { ynabTransactionImporter } from "./ynabTransactionImporter";
 
 program
   .version("0.1.0")
-  .option("-ae, --amazon-email <email>", "Amazon Account Email Address")
-  .option("-ap, --amazon-password <password>", "Amazon Account Password")
-  .option("-ye, --ynab-email <email>", "YNAB Account Email Address")
-  .option("-yp, --ynab-password <password>", "YNAB Account Password")
-  .option("-at, --ynab-access-token <access_token>", "YNAB API Access Token")
-  .option("-bi, --ynab-budget-id <budget_id>", "YNAB Budget Id")
-  .option("-ai, --ynab-account-ids <account_ids>", "YNAB Account Ids (comma delimited)")
+  .option("--amazon-email <email>", "Amazon Account Email Address")
+  .option("--amazon-password <password>", "Amazon Account Password")
+  .option("--ynab-email <email>", "YNAB Account Email Address")
+  .option("--ynab-password <password>", "YNAB Account Password")
+  .option("--ynab-access-token <access_token>", "YNAB API Access Token")
+  .option("--ynab-budget-id <budget_id>", "YNAB Budget Id")
+  .option(
+    "-ai, --ynab-account-ids <account_ids>",
+    "YNAB Account Ids (comma delimited)"
+  )
   .parse(process.argv);
+
+// If any require options are not provided print help and exit
+if (
+  !program.amazonEmail ||
+  !program.amazonPassword ||
+  !program.ynabEmail ||
+  !program.ynabPassword ||
+  !program.ynabAccessToken ||
+  !program.ynabBudgetId ||
+  !program.ynabAccountIds
+) {
+  program.help();
+}
 
 (async () => {
   // Import YNAB Transactions
@@ -22,7 +38,9 @@ program
     program.ynabEmail,
     program.ynabPassword
   );
-  await transactionImporter.importTransactions(program.ynabAccountIds.split(","));
+  await transactionImporter.importTransactions(
+    program.ynabAccountIds.split(",")
+  );
 
   // Fetch Amazon Orders
   let fromDate = moment()
