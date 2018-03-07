@@ -1,2 +1,4 @@
 tmp/
 node_modules/
+start.sh
+ops/config.yml

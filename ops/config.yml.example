@@ -1,0 +1,19 @@
+all:
+  vars:
+    # The following vars apply globally; additional config is in group_vars/all.
+    app_name: ynab-amazon       # name of application
+    deploy_user: bholt          # name of the remote user account for provisioning and deployment
+    gh_pubkey_user: bradymholt  # the Public key for this GitHub user will be added to authorized_keys for deploy_user
+production:
+  hosts:
+    159.65.171.101              # The hostname or IP address of the remote server
+  vars:
+    cron_hour: 8                # The hour of day to run
+    app_options: >              # The runtime options that will be passed in to the
+                 --amazon-email john.doe@gmail.com
+                 --amazon-password superSecret
+                 --ynab-email john.doe@gmail.com
+                 --ynab-password verySecret
+                 --ynab-access-token 01008d2c-3ef7-4b9f-b5e6-96a88a614e00
+                 --ynab-budget-id 93ec48dd-8972-44a2-b903-2393f8a1feb7
+                 --ynab-account-ids f5ce2528-9eaa-4f48-9a28-d1f3007c8761,7506aa0b-acdc-4e71-bfe2-1734f50b8acc

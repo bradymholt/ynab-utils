@@ -1,0 +1,8 @@
+---
+- name: deploy
+  hosts: all
+  remote_user: root
+  roles:
+    - user
+    - nodejs
+    - deploy

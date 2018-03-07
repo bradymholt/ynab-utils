@@ -1,0 +1,18 @@
+- name: copy files
+  become: true
+  become_user: "{{ deploy_user }}"
+  synchronize: src=../../../../ dest={{ deploy_directory }} delete=yes rsync_opts=--exclude=.git/,--exclude=log/,--exclude=tmp/,--exclude=node_modules/,--exclude=ops/
+
+- name: install packages based on package.json
+  become: true
+  become_user: "{{ deploy_user }}"
+  shell: npm install
+  args:
+    chdir: "{{ deploy_directory }}"
+
+- name: setup cron
+  become: true
+  become_user: "{{ deploy_user }}"
+  cron: name="{{ app_name }}" minute="0" hour="{{ cron_hour }}"
+    job="/bin/bash -l -c 'cd {{ deploy_directory }} && npx ts-node src/index.ts {{ app_options }}' >> {{ log_file }}"
+
