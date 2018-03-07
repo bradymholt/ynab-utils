@@ -9,7 +9,7 @@ production:
     159.65.171.101              # The hostname or IP address of the remote server
   vars:
     cron_hour: 8                # The hour of day to run
-    app_options: >              # The runtime options that will be passed in to the
+    app_options: >              # The runtime options that will be passed in to the app
                  --amazon-email john.doe@gmail.com
                  --amazon-password superSecret
                  --ynab-email john.doe@gmail.com
