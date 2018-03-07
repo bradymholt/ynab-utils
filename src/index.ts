@@ -1,22 +1,47 @@
+import * as moment from "moment";
+import * as program from "commander";
+
 import { AmazonOrderFetcher } from "./amazonOrderFetcher";
 import { ynabMemoUpdator } from "./ynabMemoUpdator";
-import * as moment from "moment";
+import { ynabTransactionImporter } from "./ynabTransactionImporter";
+
+program
+  .version("0.1.0")
+  .option("-ae, --amazon-email <email>", "Amazon Account Email Address")
+  .option("-ap, --amazon-password <password>", "Amazon Account Password")
+  .option("-ye, --ynab-email <email>", "YNAB Account Email Address")
+  .option("-yp, --ynab-password <password>", "YNAB Account Password")
+  .option("-at, --ynab-access-token <access_token>", "YNAB API Access Token")
+  .option("-bi, --ynab-budget-id <budget_id>", "YNAB Budget Id")
+  .option("-ai, --ynab-account-ids <account_ids>", "YNAB Account Ids (comma delimited)")
+  .parse(process.argv);
 
 (async () => {
-  const amazonEmail = process.argv[2];
-  const amazonPassword = process.argv[3];
+  // Import YNAB Transactions
+  const transactionImporter = new ynabTransactionImporter(
+    program.ynabEmail,
+    program.ynabPassword
+  );
+  await transactionImporter.importTransactions(program.ynabAccountIds.split(","));
 
-  const ynabAccessToken = process.argv[4];
-  const budgetId = process.argv[5];
-
+  // Fetch Amazon Orders
   let fromDate = moment()
     .subtract(1, "month")
     .toISOString();
   let toDate = moment().toISOString();
 
-  const amazonOrderFetcher = new AmazonOrderFetcher(amazonEmail, amazonPassword);
+  const amazonOrderFetcher = new AmazonOrderFetcher(
+    program.amazonEmail,
+    program.amazonPassword
+  );
   const amazonOrders = await amazonOrderFetcher.getOrders(fromDate, toDate);
-  
-  const ynabMemoUpdater = new ynabMemoUpdator(ynabAccessToken);
-  await ynabMemoUpdater.updateAmazonTransactionMemos(budgetId, amazonOrders);
+
+  // Update Amazon Transaction memos
+  const memoUpdator = new ynabMemoUpdator(program.ynabAccessToken);
+  await memoUpdator.updateAmazonTransactionMemos(
+    program.ynabBudgetId,
+    amazonOrders
+  );
+
+  process.exit(0);
 })();

@@ -66,6 +66,7 @@ export class AmazonOrderFetcher {
   private async login(page: any) {
     const loginPath = "https://www.amazon.com";
 
+    console.log(`Logging into Amazon...`);
     await page.goto(loginPath);
     await page.click("#nav-signin-tooltip .nav-action-button");
     await page.waitForSelector("#ap_email");
@@ -92,6 +93,7 @@ export class AmazonOrderFetcher {
       AmazonOrderReportTypeEmum.Shipments
     );
 
+    console.log(`Generating Orders report...`);
     await page.click("#report-confirm");
 
     const fileName = await this.waitForFileToBeCreated(tmpDirectoryPath);
@@ -135,6 +137,8 @@ export class AmazonOrderFetcher {
       toDateISO,
       AmazonOrderReportTypeEmum.Items
     );
+
+    console.log(`Generating Order Items report...`);
     await page.click("#report-confirm");
 
     const fileName = await this.waitForFileToBeCreated(tmpDirectoryPath);
