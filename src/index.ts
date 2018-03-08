@@ -5,8 +5,9 @@ import { AmazonOrderFetcher } from "./amazonOrderFetcher";
 import { ynabMemoUpdator } from "./ynabMemoUpdator";
 import { ynabTransactionImporter } from "./ynabTransactionImporter";
 
-program.version("1.0.0");
+console.info(`${moment().toISOString()} - STARTING UP`);
 
+program.version("1.0.0");
 program
   .command("importTransactions", "Import transactions for an account")
   .argument("<email>", "YNAB Account Email Address")
@@ -16,7 +17,6 @@ program
     const transactionImporter = new ynabTransactionImporter(args.email, args.password);
     await transactionImporter.importTransactions(args.accountId);
   });
-
 program
   .command("updateAmazonMemos", "Update Amazon transactions in YNAB with list of order items")
   .argument("<email>", "Amazon Account Email Address")

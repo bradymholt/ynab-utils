@@ -24,7 +24,7 @@ USAGE
      -v, --verbose      Verbose mode - will also output debug messages
 ```
 
-## Deploy
+## Deployment
 
 Deployment is handled with an Ansible playbook located on the `ops/` folder.  To deploy the app:
 
