@@ -1,5 +1,5 @@
 {
-  "name": "ynab-amazon",
+  "name": "ynab-utils",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -10,7 +10,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "commander": "^2.14.1",
+    "caporal": "^0.10.0",
     "lodash": "^4.17.5",
     "moment": "^2.21.0",
     "puppeteer": "^1.1.1",
@@ -22,5 +22,8 @@
     "@types/puppeteer": "^1.1.0",
     "ts-node": "^5.0.1",
     "typescript": "^2.7.2"
+  },
+  "prettier": {
+    "printWidth": 120
   }
 }
