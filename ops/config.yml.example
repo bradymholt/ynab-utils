@@ -1,7 +1,7 @@
 all:
   vars:
     # The following vars apply globally; additional config is in group_vars/all.
-    app_name: ynab-amazon       # name of application
+    app_name: ynab-utils        # name of application
     deploy_user: bholt          # name of the remote user account for provisioning and deployment
     gh_pubkey_user: bradymholt  # the Public key for this GitHub user will be added to authorized_keys for deploy_user
 production:
