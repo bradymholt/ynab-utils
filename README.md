@@ -2,26 +2,34 @@
 
 Some miscellaneous utilities for YNAB
 
+## Setup
+
+```
+git clone https://github.com/bradymholt/ynab-utils.git
+cd ynab-utils
+./ynab-utils
+```
+
 ## Usage
 
 ```
 USAGE
 
-     index.ts <command> [options]
+  ynab-utils <command> [options]
 
-   COMMANDS
+COMMANDS
 
-     importTransactions <email> <password> <account_ids>                  Import transactions
-     updateAmazonMemos <email> <password> <budget_id> <access_token>      Update Amazon transactions in YNAB with list of order items
-     help <command>                                                       Display help for a specific command
+  importTransactions <email> <password> <account_ids>                  Import transactions
+  updateAmazonMemos <email> <password> <access_token> <budget_id>      Update Amazon transactions in YNAB with list of order items
+  help <command>                                                       Display help for a specific command
 
-   GLOBAL OPTIONS
+GLOBAL OPTIONS
 
-     -h, --help         Display help
-     -V, --version      Display version
-     --no-color         Disable colors
-     --quiet            Quiet mode - only displays warn and error messages
-     -v, --verbose      Verbose mode - will also output debug messages
+  -h, --help         Display help
+  -V, --version      Display version
+  --no-color         Disable colors
+  --quiet            Quiet mode - only displays warn and error messages
+  -v, --verbose      Verbose mode - will also output debug messages
 ```
 
 ## Deployment

@@ -2,7 +2,7 @@
   "name": "ynab-utils",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "bin": "./ynab-utils",
   "scripts": {
     "start": "npx ts-node src/index.ts",
     "deploy": "ops/config-init && ansible-playbook -i ./ops/config.yml ./ops/playbook.yml"
