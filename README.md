@@ -26,4 +26,10 @@ USAGE
 
 ## Deployment
 
-Deployment is handled with an Ansible playbook located on the `ops/` folder.  To deploy the app, run `npm run deploy`. The first time you run this you will be prompted for deployment config values which will be saved to `ops/config.yml`.
+Run:
+
+shell```
+npm run deploy
+```
+
+Deployment is handled with an Ansible playbook located on the `ops/` folder.  The first time you run this you will be prompted for deployment config values which will be saved to `ops/config.yml`.
