@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "ts-node src/index.ts",
-    "deploy": "ansible-playbook -i ./ops/config.yml ./ops/playbook.yml"
+    "start": "npx ts-node src/index.ts",
+    "deploy": "npx ts-node ops/config-init.ts && ansible-playbook -i ./ops/config.yml ./ops/playbook.yml"
   },
   "author": "",
   "license": "ISC",
@@ -17,9 +17,13 @@
     "ynab": "^0.11.0"
   },
   "devDependencies": {
+    "@types/inquirer": "0.0.37",
+    "@types/js-yaml": "^3.10.1",
     "@types/lodash": "^4.14.104",
-    "@types/node": "^9.4.6",
+    "@types/node": "^9.4.7",
     "@types/puppeteer": "^1.1.0",
+    "inquirer": "^5.1.0",
+    "js-yaml": "^3.11.0",
     "ts-node": "^5.0.1",
     "typescript": "^2.7.2"
   },
