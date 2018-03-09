@@ -1,8 +1,7 @@
 import * as moment from "moment";
 import * as program from "caporal";
 
-import { AmazonOrderFetcher } from "./amazonOrderFetcher";
-import { ynabMemoUpdator } from "./ynabMemoUpdator";
+import { ynabAmazonMemoUpdator } from "./ynabAmazonMemoUpdator";
 import { ynabTransactionImporter } from "./ynabTransactionImporter";
 
 console.info(`${moment().toISOString()} - STARTING UP`);
@@ -16,25 +15,17 @@ program
   .action(async args => {
     const transactionImporter = new ynabTransactionImporter(args.email, args.password);
     const accountIds = args.accountIds.split(",");
-    await transactionImporter.importTransactions(accountIds);
+    await transactionImporter.run(accountIds);
   });
 program
   .command("updateAmazonMemos", "Update Amazon transactions in YNAB with list of order items")
   .argument("<email>", "Amazon Account Email Address")
   .argument("<password>", "Amazon Account Password")
   .argument("<access_token>", "YNAB API Access Token")
-  .argument("<budget_id>", "YNAB Budget Id")  
+  .argument("<budget_id>", "YNAB Budget Id")
   .action(async args => {
-    let fromDate = moment()
-      .subtract(1, "month")
-      .toISOString();
-    let toDate = moment().toISOString();
-
-    const amazonOrderFetcher = new AmazonOrderFetcher(args.email, args.password);
-    const amazonOrders = await amazonOrderFetcher.getOrders(fromDate, toDate);
-
-    const memoUpdator = new ynabMemoUpdator(args.accessToken);
-    await memoUpdator.updateAmazonTransactionMemos(args.budgetId, amazonOrders);
+    const memoUpdator = new ynabAmazonMemoUpdator(args.accessToken, args.budgetId, args.email, args.password);
+    memoUpdator.run();
   });
 
 program.parse(process.argv);

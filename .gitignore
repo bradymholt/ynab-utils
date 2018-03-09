@@ -1,5 +1,5 @@
-tmp/
 node_modules/
-start.sh
+tmp/
+dist/
 ops/config.yml
 ops/*.retry

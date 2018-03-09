@@ -9,7 +9,7 @@ export class ynabTransactionImporter {
     this.password = password;
   }
 
-  public async importTransactions(accountIds: string[]) {
+  public async run(accountIds: string[]) {
     // Setup
     const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
