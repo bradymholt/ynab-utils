@@ -13,6 +13,7 @@
 - name: setup cron
   become: true
   become_user: "{{ deploy_user }}"
-  cron: name="{{ app_name }}" minute="0" hour="{{ cron_hour }}"
-    job="/bin/bash -l -c 'cd {{ deploy_directory }} && npx ts-node src/index.ts {{ app_options }}' >> {{ log_file }}"
+  cron: name="{{ app_name }} - Job {{ item.0 }}" minute="0" hour="{{ item.1.cron_hour }}"
+    job="/bin/bash -l -c 'cd {{ deploy_directory }} && {{ app_cmd }} {{ item.1.app_args }}' >> {{ log_file }}"
+  with_indexed_items: "{{ app_jobs }}"
 

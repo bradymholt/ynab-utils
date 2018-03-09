@@ -8,12 +8,6 @@ production:
   hosts:
     159.65.171.101              # The hostname or IP address of the remote server
   vars:
-    cron_hour: 8                # The hour of day to run
-    app_options: >              # The runtime options that will be passed in to the app
-                 --amazon-email john.doe@gmail.com
-                 --amazon-password superSecret
-                 --ynab-email john.doe@gmail.com
-                 --ynab-password verySecret
-                 --ynab-access-token 01008d2c-3ef7-4b9f-b5e6-96a88a614e00
-                 --ynab-budget-id 93ec48dd-8972-44a2-b903-2393f8a1feb7
-                 --ynab-account-ids f5ce2528-9eaa-4f48-9a28-d1f3007c8761,7506aa0b-acdc-4e71-bfe2-1734f50b8acc
+    cron_jobs:                  # The cron jobs that will be scheduled
+      - { cron_hour: 8, app_args: importTransactions john.doe@gmail.com superSecret! 0cf96c6f-a244-4af5-8111-2bd3940b1698,ee5b41ef-5e56-4252-b6d3-0db7de4e3356 }
+      - { cron_hour: 9, app_args: updateAmazonMemos john.doe@gmail.com superSecret! 8907f604-b3e0-4268-9cef-c45e88dca47b e748595f-0504-4b7f-ab99-2fa9e3891dc4 }

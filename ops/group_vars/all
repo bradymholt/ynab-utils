@@ -1,4 +1,5 @@
 ---
 ansible_python_interpreter: /usr/bin/python3
 deploy_directory: "/home/{{ deploy_user }}/apps/{{ app_name }}"
+app_cmd: "npx ts-node src/index.ts"
 log_file: "/var/log/{{ app_name }}.log"

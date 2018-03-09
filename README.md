@@ -11,7 +11,7 @@ USAGE
 
    COMMANDS
 
-     importTransactions <email> <password> <account_id>                   Import transactions for an account
+     importTransactions <email> <password> <account_ids>                  Import transactions
      updateAmazonMemos <email> <password> <budget_id> <access_token>      Update Amazon transactions in YNAB with list of order items
      help <command>                                                       Display help for a specific command
 
