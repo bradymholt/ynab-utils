@@ -14,7 +14,9 @@
     "lodash": "^4.17.5",
     "moment": "^2.21.0",
     "puppeteer": "^1.1.1",
-    "ynab": "^0.11.0"
+    "ynab": "^0.11.0",
+    "ts-node": "^5.0.1",
+    "typescript": "^2.7.2"
   },
   "devDependencies": {
     "@types/inquirer": "0.0.37",
@@ -23,9 +25,7 @@
     "@types/node": "^9.4.7",
     "@types/puppeteer": "^1.1.0",
     "inquirer": "^5.1.0",
-    "js-yaml": "^3.11.0",
-    "ts-node": "^5.0.1",
-    "typescript": "^2.7.2"
+    "js-yaml": "^3.11.0"
   },
   "prettier": {
     "printWidth": 120
