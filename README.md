@@ -28,7 +28,7 @@ USAGE
 
 Run:
 
-sh```
+```shell
 npm run deploy
 ```
 
