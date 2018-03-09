@@ -1,6 +1,6 @@
 # ynab-utils
 
-Various utilities for YNAB
+Some miscellaneous utilities for YNAB
 
 ## Usage
 
