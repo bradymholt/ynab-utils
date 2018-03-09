@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "npx ts-node src/index.ts",
-    "deploy": "npx ts-node ops/config-init.ts && ansible-playbook -i ./ops/config.yml ./ops/playbook.yml"
+    "deploy": "ops/config-init && ansible-playbook -i ./ops/config.yml ./ops/playbook.yml"
   },
   "author": "",
   "license": "ISC",
