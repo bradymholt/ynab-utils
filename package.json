@@ -1,14 +1,14 @@
 {
   "name": "ynab-utils",
   "version": "1.0.0",
-  "description": "",
+  "description": "Some miscellaneous utilities for YNAB",
   "bin": "./ynab-utils",
   "scripts": {
     "start": "npx ts-node src/index.ts",
     "deploy": "ops/config-init && ansible-playbook -i ./ops/config.yml ./ops/playbook.yml"
   },
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "caporal": "^0.10.0",
     "lodash": "^4.17.5",
