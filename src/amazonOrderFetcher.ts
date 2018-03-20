@@ -53,12 +53,9 @@ export class AmazonOrderFetcher {
         .join(", ");
     });
 
-    const itemsListByOrderAmount = <IAmazonItemsByAmount>_.mapKeys(
-      itemsListByOrderId,
-      (value, key) => {
-        return ordersById[key].amount;
-      }
-    );
+    const itemsListByOrderAmount = <IAmazonItemsByAmount>_.mapKeys(itemsListByOrderId, (value, key) => {
+      return ordersById[key].amount;
+    });
 
     return itemsListByOrderAmount;
   }
@@ -86,21 +83,14 @@ export class AmazonOrderFetcher {
    */
   private async fetchOrders(page: any, fromDateISO: string, toDateISO: string) {
     const tmpDirectoryPath = path.resolve(__dirname, "../tmp");
-    await this.setupReportParameters(
-      page,
-      fromDateISO,
-      toDateISO,
-      AmazonOrderReportTypeEmum.Shipments
-    );
+    await this.setupReportParameters(page, fromDateISO, toDateISO, AmazonOrderReportTypeEmum.Shipments);
 
     console.log(`Generating Orders report...`);
     await page.click("#report-confirm");
 
     const fileName = await this.waitForFileToBeCreated(tmpDirectoryPath);
 
-    let items = fs
-      .readFileSync(path.resolve(tmpDirectoryPath, fileName))
-      .toString();
+    let items = fs.readFileSync(path.resolve(tmpDirectoryPath, fileName)).toString();
 
     let parsedOrders: Array<IAmazonOrder> = items
       .split("\n")
@@ -124,28 +114,17 @@ export class AmazonOrderFetcher {
    * @param fromDateISO
    * @param toDateISO
    */
-  private async fetchOrderItems(
-    page: any,
-    fromDateISO: string,
-    toDateISO: string
-  ) {
+  private async fetchOrderItems(page: any, fromDateISO: string, toDateISO: string) {
     const tmpDirectoryPath = path.resolve(__dirname, "../tmp");
 
-    await this.setupReportParameters(
-      page,
-      fromDateISO,
-      toDateISO,
-      AmazonOrderReportTypeEmum.Items
-    );
+    await this.setupReportParameters(page, fromDateISO, toDateISO, AmazonOrderReportTypeEmum.Items);
 
     console.log(`Generating Order Items report...`);
     await page.click("#report-confirm");
 
     const fileName = await this.waitForFileToBeCreated(tmpDirectoryPath);
 
-    let items = fs
-      .readFileSync(path.resolve(tmpDirectoryPath, fileName))
-      .toString();
+    let items = fs.readFileSync(path.resolve(tmpDirectoryPath, fileName)).toString();
 
     let parsedOrderItems: Array<IAmazonOrderItem> = items
       .split("\n")
@@ -208,14 +187,15 @@ export class AmazonOrderFetcher {
    * @param directoryPath
    * @param timeoutMilliseconds
    */
-  private async waitForFileToBeCreated(
-    directoryPath: string,
-    timeoutMilliseconds = 10000
-  ): Promise<string> {
+  private async waitForFileToBeCreated(directoryPath: string, timeoutMilliseconds = 10000): Promise<string> {
+    const resolveDelayMilliseconds = 2000;
     return new Promise<string>((resolve, reject) => {
       fs.watch(directoryPath, (eventType, filename) => {
         if (!filename.endsWith(".crdownload")) {
-          resolve(filename);
+          // resolve promise after delay to allow time for buffering
+          setTimeout(() => {
+            resolve(filename);
+          }, resolveDelayMilliseconds);
         }
       });
       setTimeout(() => {
