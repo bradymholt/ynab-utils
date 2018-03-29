@@ -5,6 +5,10 @@ import { ynabAmazonMemoUpdator } from "./ynabAmazonMemoUpdator";
 import { ynabTransactionImporter } from "./ynabTransactionImporter";
 
 export function run() {
+  process.on("unhandledRejection", r => {
+    console.log(r);
+    process.exit(1);
+  });
   console.info(`${moment().toISOString()} - STARTING UP`);
 
   program.version("1.0.0");

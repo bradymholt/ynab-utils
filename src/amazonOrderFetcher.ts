@@ -18,12 +18,28 @@ export class AmazonOrderFetcher {
     this.password = password;
   }
 
-  /**
+   /**
    * Runs an order report and returns a list og order items indexed by the order amount
    * @param fromDateISO
    * @param toDateISO
+   * @param attemptsAllowed if a failure occures, the number of retries allowed
    */
-  public async getOrders(fromDateISO: string, toDateISO: string) {
+  public async getOrders(fromDateISO: string, toDateISO: string, attemptsAllowed = 2) {
+    let attemptsLeft = attemptsAllowed;
+    while (attemptsLeft >= 0) {
+      try {
+        return this.getOrdersInternal(fromDateISO, toDateISO);
+      } catch (e) {
+        console.log(`ERROR: ${e}`);
+        if (attemptsLeft > 0) {
+          console.log(`Trying again. (${attemptsLeft} attempts left)`);
+          attemptsLeft--;
+        }
+      }
+    }
+  }
+
+  private async getOrdersInternal(fromDateISO: string, toDateISO: string) {
     const userAgent =
       "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.167 Safari/537.36";
     const acceptLanguageHeader = {
@@ -65,14 +81,17 @@ export class AmazonOrderFetcher {
 
     console.log(`Logging into Amazon...`);
     await page.goto(loginPath);
+    console.log(`Activating login prompt.`);
     await page.click("#nav-signin-tooltip .nav-action-button");
     await page.waitForSelector("#ap_email");
     await page.type("#ap_email", this.email);
     await page.click(".a-button-input");
     await page.waitForSelector("#ap_password");
     await page.type("#ap_password", this.password);
+    console.log(`Submitting login information.`);
     await page.click("#signInSubmit");
-    await page.waitFor("#nav-your-amazon");
+    await this.wait(15000);
+    await page.waitFor("#nav-your-amazon", { timeout: 60000 });
   }
 
   /**
@@ -189,18 +208,17 @@ export class AmazonOrderFetcher {
    */
   private async waitForFileToBeCreated(directoryPath: string, timeoutMilliseconds = 10000): Promise<string> {
     const resolveDelayMilliseconds = 2000;
-    return new Promise<string>((resolve, reject) => {
-      fs.watch(directoryPath, (eventType, filename) => {
+    return new Promise<string>(async (resolve, reject) => {
+      fs.watch(directoryPath, async (eventType, filename) => {
         if (!filename.endsWith(".crdownload")) {
           // resolve promise after delay to allow time for buffering
-          setTimeout(() => {
-            resolve(filename);
-          }, resolveDelayMilliseconds);
+          await this.wait(resolveDelayMilliseconds);
+          resolve(filename);
         }
       });
-      setTimeout(() => {
-        reject();
-      }, timeoutMilliseconds);
+
+      await this.wait(timeoutMilliseconds);
+      reject();
     });
   }
 
@@ -219,5 +237,13 @@ export class AmazonOrderFetcher {
       // Create the directory
       fs.mkdirSync(directoryPath);
     }
+  }
+
+  private wait(milliseconds: number) {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        resolve();
+      }, milliseconds);
+    });
   }
 }

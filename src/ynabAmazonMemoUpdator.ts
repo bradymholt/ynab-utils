@@ -29,7 +29,7 @@ export class ynabAmazonMemoUpdator {
       const amazonOrders = await amazonOrderFetcher.getOrders(fromISODate, toISODate);
       await this.updateAmazonTransactionMemos(this.budgetId, unapprovedAmazonTransactions, amazonOrders);
     } else {
-      console.log("No unapproved Amazon transactions found.")
+      console.log("No unapproved Amazon transactions found.");
     }
   }
 
@@ -46,6 +46,7 @@ export class ynabAmazonMemoUpdator {
   ) {
     console.log(`Updating transaction memos in YNAB...`);
     for (let transaction of unapprovedAmazonTransactions) {
+      let updateTransaction = <ynab.SaveTransaction>transaction;
       let txnAmount = Math.abs(transaction.amount * 0.001).toFixed(2);
       let amazonOrderByAmount = amazonOrders[txnAmount];
       if (amazonOrderByAmount) {
@@ -53,7 +54,9 @@ export class ynabAmazonMemoUpdator {
 
         console.log(`  ${transaction.date} ${transaction.amount} ${updatedMemo}`);
 
-        transaction.memo = updatedMemo;
+        updateTransaction.payee_name = null!;
+        updateTransaction.memo = updatedMemo;
+        
         await this.ynabAPI.transactions.updateTransaction(budgetId, transaction.id, {
           transaction
         });
@@ -62,23 +65,14 @@ export class ynabAmazonMemoUpdator {
   }
 
   private async getUnapprovedAmazonTransactions(budgetId: string) {
-    const amazonPayeeIds = await this.getAmazonPayeeIds(budgetId);
     const transactions = await this.ynabAPI.transactions.getTransactions(budgetId, undefined, "unapproved");
     const unapprovedAmazonTransactions = transactions.data.transactions.filter(t => {
-      return amazonPayeeIds.indexOf(t.payee_id) > 0;
+      if (!t.payee_name) {
+        return false;
+      }
+
+      return t.payee_name.toLowerCase().indexOf("amazon") > -1;
     });
     return unapprovedAmazonTransactions;
-  }
-
-  private async getAmazonPayeeIds(budgetId: string) {
-    const payees = await this.ynabAPI.payees.getPayees(budgetId);
-    const amazonPayeeIds = payees.data.payees
-      .filter(p => {
-        return p.name.toLowerCase().match(/amazon/);
-      })
-      .map(p => {
-        return p.id;
-      });
-    return amazonPayeeIds;
   }
 }
