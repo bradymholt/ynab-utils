@@ -37,6 +37,8 @@ export class AmazonOrderFetcher {
         }
       }
     }
+
+    return {};
   }
 
   private async getOrdersInternal(fromDateISO: string, toDateISO: string) {
