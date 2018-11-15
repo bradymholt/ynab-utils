@@ -3,6 +3,7 @@ import * as program from "caporal";
 
 import { ynabAmazonMemoUpdator } from "./ynabAmazonMemoUpdator";
 import { ynabTransactionImporter } from "./ynabTransactionImporter";
+import { ynabTransactionApprover } from "./ynabTransactionApprover";
 
 export function run() {
   process.on("unhandledRejection", r => {
@@ -31,6 +32,14 @@ export function run() {
     .action(async args => {
       const memoUpdator = new ynabAmazonMemoUpdator(args.accessToken, args.budgetId, args.email, args.password);
       memoUpdator.run();
+    });
+  program
+    .command("approveTransactions", "Auto-approves categorized transactions")
+    .argument("<access_token>", "YNAB API Access Token")
+    .argument("<budget_id>", "YNAB Budget Id")
+    .action(async args => {
+      const categorizer = new ynabTransactionApprover(args.accessToken, args.budgetId);
+      categorizer.run();
     });
 
   program.parse(process.argv);
