@@ -3,7 +3,9 @@ import * as path from "path";
 import * as yaml from "js-yaml";
 import * as inquirer from "inquirer";
 
-export function init() {
+init();
+
+function init() {
   const configFile = path.join(__dirname, "config.yml");
   const templateFile = path.join(__dirname, "config.yml.example");
 
