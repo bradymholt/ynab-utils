@@ -46,7 +46,6 @@ export class ynabAmazonMemoUpdator {
   ) {
     console.log(`Updating transaction memos in YNAB...`);
     for (let transaction of unapprovedAmazonTransactions) {
-      let updateTransaction = <ynab.SaveTransaction>transaction;
       let txnAmount = Math.abs(transaction.amount * 0.001).toFixed(2);
       let amazonOrderByAmount = amazonOrders[txnAmount];
       if (amazonOrderByAmount) {
@@ -54,9 +53,9 @@ export class ynabAmazonMemoUpdator {
 
         console.log(`  ${transaction.date} ${transaction.amount} ${updatedMemo}`);
 
-        updateTransaction.payee_name = null!;
-        updateTransaction.memo = updatedMemo;
-        
+        transaction.payee_name = null!;
+        transaction.memo = updatedMemo;
+
         await this.ynabAPI.transactions.updateTransaction(budgetId, transaction.id, {
           transaction
         });
