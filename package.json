@@ -4,8 +4,8 @@
   "description": "Some miscellaneous utilities for YNAB",
   "bin": "./ynab-utils",
   "scripts": {
-    "deploy": "ops/config-init && ansible-playbook -i ./ops/config.yml ./ops/playbook.yml"
     "start": "./ynab-utils",
+    "deploy": "ts-node ops/config-init.ts && ansible-playbook -i ./ops/config.yml ./ops/playbook.yml"
   },
   "author": "",
   "license": "MIT",
