@@ -8,8 +8,8 @@
       "type": "node",
       "request": "launch",
       "name": "CLI",
-      "program": "${workspaceRoot}/node_modules/ts-node/dist/bin.js",
-      "args": ["${workspaceFolder}/src/index.ts"]
+      "program": "${workspaceFolder}/ynab-utils",
+      "args": ["importTransactions"]
     }
   ]
 }
