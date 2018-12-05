@@ -78,7 +78,7 @@ export class AmazonOrderFetcher {
     return itemsListByOrderAmount;
   }
 
-  private async login(page: any) {
+  private async login(page: puppeteer.Page) {
     const loginPath = "https://www.amazon.com";
 
     console.log(`Logging into Amazon...`);
@@ -102,7 +102,7 @@ export class AmazonOrderFetcher {
    * @param fromDateISO
    * @param toDateISO
    */
-  private async fetchOrders(page: any, fromDateISO: string, toDateISO: string) {
+  private async fetchOrders(page: puppeteer.Page, fromDateISO: string, toDateISO: string) {
     const tmpDirectoryPath = path.resolve(__dirname, "../tmp");
     await this.setupReportParameters(page, fromDateISO, toDateISO, AmazonOrderReportTypeEmum.Shipments);
 
@@ -135,7 +135,7 @@ export class AmazonOrderFetcher {
    * @param fromDateISO
    * @param toDateISO
    */
-  private async fetchOrderItems(page: any, fromDateISO: string, toDateISO: string) {
+  private async fetchOrderItems(page: puppeteer.Page, fromDateISO: string, toDateISO: string) {
     const tmpDirectoryPath = path.resolve(__dirname, "../tmp");
 
     await this.setupReportParameters(page, fromDateISO, toDateISO, AmazonOrderReportTypeEmum.Items);

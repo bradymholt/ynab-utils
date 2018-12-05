@@ -24,7 +24,7 @@ export class ynabTransactionImporter {
     await browser.close();
   }
 
-  private async login(page: any) {
+  private async login(page: puppeteer.Page) {
     const loginPath = "https://app.youneedabudget.com/users/login";
 
     console.log(`Logging into YNAB...`);
