@@ -1,0 +1,8 @@
+{
+  "ynab_web_email": "john.doe@gmail.com",
+  "ynab_web_password": "superSecret",
+  "personal_access_token": "1234567890",
+  "budget_id": "last-used",
+  "amazon_email": "john.doe@gmail.com",
+  "amazon_password": "superSecret"
+}

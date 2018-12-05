@@ -10,5 +10,5 @@ production:
     159.65.171.101              # The hostname or IP address of the remote server
   vars:
     cron_jobs:                  # The cron jobs that will be scheduled
-      - { cron_hour: 8, app_args: "importTransactions john.doe@gmail.com superSecret! 0cf96c6f-a244-4af5-8111-2bd3940b1698,ee5b41ef-5e56-4252-b6d3-0db7de4e3356" }
-      - { cron_hour: 9, app_args: "updateAmazonMemos john.doe@gmail.com superSecret! 8907f604-b3e0-4268-9cef-c45e88dca47b e748595f-0504-4b7f-ab99-2fa9e3891dc4" }
+      - { cron_hour: 8, app_args: "all" }
+      - { cron_hour: 9, app_args: "all" }

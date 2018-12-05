@@ -1,5 +1,7 @@
+config.json
 node_modules/
 tmp/
 dist/
 ops/config.yml
 ops/*.retry
+

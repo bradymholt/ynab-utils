@@ -9,7 +9,7 @@
       "request": "launch",
       "name": "CLI",
       "program": "${workspaceFolder}/ynab-utils",
-      "args": ["importTransactions"]
+      "args": ["all"]
     }
   ]
 }

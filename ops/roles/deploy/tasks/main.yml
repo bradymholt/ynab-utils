@@ -1,12 +1,12 @@
 - name: copy files
   become: true
   become_user: "{{ deploy_user }}"
-  synchronize: src=../../../../ dest={{ deploy_directory }} delete=yes rsync_opts=--exclude=.git/,--exclude=log/,--exclude=tmp/,--exclude=node_modules/,--exclude=ops/
+  synchronize: src=../../../../ dest={{ deploy_directory }} delete=yes rsync_opts=--exclude=.git/,--exclude=log/,--exclude=tmp/,--exclude=node_modules/,--exclude=ops/,--exclude=*.example
 
 - name: install packages based on package.json
   become: true
   become_user: "{{ deploy_user }}"
-  shell: npm install
+  shell: npm install --only=production
   args:
     chdir: "{{ deploy_directory }}"
 
