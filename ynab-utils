@@ -1,4 +1,6 @@
 #!/usr/bin/env node
 
-require('ts-node').register();
-require('./src/index.ts').run();
+require("ts-node").register();
+(async function() {
+  await require("./src/index.ts").run();
+})();

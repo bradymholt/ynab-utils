@@ -1,11 +1,13 @@
 import * as moment from "moment";
 import * as program from "caporal";
 
+import * as config from "../config.json";
+
 import { ynabAmazonMemoUpdator } from "./ynabAmazonMemoUpdator";
 import { ynabTransactionImporter } from "./ynabTransactionImporter";
 import { ynabTransactionApprover } from "./ynabTransactionApprover";
 
-export function run() {
+export async function run() {
   process.on("unhandledRejection", r => {
     console.log(r);
     process.exit(1);
@@ -13,34 +15,53 @@ export function run() {
   console.info(`${moment().toISOString()} - STARTING UP`);
 
   program.version("1.0.0");
-  program
-    .command("importTransactions", "Import transactions")
-    .argument("<email>", "YNAB Account Email Address")
-    .argument("<password>", "YNAB Account Password")
-    .argument("<account_ids>", "YNAB Account Ids (comma delimited)")
-    .action(async args => {
-      const transactionImporter = new ynabTransactionImporter(args.email, args.password);
-      const accountIds = args.accountIds.split(",");
-      await transactionImporter.run(accountIds);
-    });
+  program.command("importTransactions", "Import transactions").action(async args => {
+    await importTransactions();
+  });
   program
     .command("updateAmazonMemos", "Update Amazon transactions in YNAB with list of order items")
-    .argument("<email>", "Amazon Account Email Address")
-    .argument("<password>", "Amazon Account Password")
-    .argument("<access_token>", "YNAB API Access Token")
-    .argument("<budget_id>", "YNAB Budget Id")
     .action(async args => {
-      const memoUpdator = new ynabAmazonMemoUpdator(args.accessToken, args.budgetId, args.email, args.password);
-      memoUpdator.run();
+      await updateAmazonMemos();
     });
-  program
-    .command("approveTransactions", "Auto-approves categorized transactions")
-    .argument("<access_token>", "YNAB API Access Token")
-    .argument("<budget_id>", "YNAB Budget Id")
-    .action(async args => {
-      const categorizer = new ynabTransactionApprover(args.accessToken, args.budgetId);
-      categorizer.run();
-    });
+  program.command("approveTransactions", "Auto-approves categorized transactions").action(async args => {
+    await approveTransactions();
+  });
+  program.command("all", "Runs all commands").action(async args => {
+    await importTransactions();
+    await updateAmazonMemos();
+    await approveTransactions();
+    process.exit(0);
+  });
 
   program.parse(process.argv);
+}
+
+async function importTransactions() {
+  console.info(`RUNNING: importTransactions`);
+  try {
+    await new ynabTransactionImporter(config.ynab_web_email, config.ynab_web_password).run();
+  } catch (error) {
+    console.log(`ERROR: ${error}`);
+  }
+}
+async function updateAmazonMemos() {
+  console.info(`RUNNING: updateAmazonMemos`);
+  try {
+    await new ynabAmazonMemoUpdator(
+      config.personal_access_token,
+      config.budget_id,
+      config.amazon_email,
+      config.amazon_password
+    ).run();
+  } catch (error) {
+    console.log(`ERROR: ${error}`);
+  }
+}
+async function approveTransactions() {
+  console.info(`RUNNING: approveTransactions`);
+  try {
+    await new ynabTransactionApprover(config.personal_access_token, config.budget_id).run();
+  } catch (error) {
+    console.log(`ERROR: ${error}`);
+  }
 }

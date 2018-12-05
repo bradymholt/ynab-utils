@@ -7,6 +7,8 @@ Some miscellaneous utilities for YNAB
 ```
 git clone https://github.com/bradymholt/ynab-utils.git
 cd ynab-utils
+cp ./config.json.example ./config.json
+# Modify ./config.json
 ./ynab-utils
 ```
 

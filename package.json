@@ -5,26 +5,28 @@
   "bin": "./ynab-utils",
   "scripts": {
     "start": "./ynab-utils",
+    "lint": "tslint --project ./",
     "deploy": "ts-node ops/config-init.ts && ansible-playbook -i ./ops/config.yml ./ops/playbook.yml"
   },
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "caporal": "^0.10.0",
-    "lodash": "^4.17.11",
-    "moment": "^2.22.2",
-    "puppeteer": "^1.10.0",
-    "ynab": "^1.9.0",
-    "ts-node": "^7.0.1",
-    "typescript": "^3.1.6"
-  },
-  "devDependencies": {
     "@types/inquirer": "0.0.43",
     "@types/js-yaml": "^3.11.2",
-    "@types/lodash": "^4.14.118",
-    "@types/node": "^10.12.8",
-    "@types/puppeteer": "^1.10.0",
-    "inquirer": "^6.2.0",
+    "@types/lodash": "^4.14.119",
+    "@types/node": "^10.12.12",
+    "@types/puppeteer": "^1.11.1",
+    "caporal": "^1.1.0",
+    "lodash": "^4.17.11",
+    "moment": "^2.22.2",
+    "puppeteer": "^1.11.0",
+    "ynab": "^1.9.0",
+    "typescript": "^3.2.1",
+    "ts-node": "^7.0.1"
+  },
+  "devDependencies": {
+    "tslint": "^5.11.0",
+    "inquirer": "^6.2.1",
     "js-yaml": "^3.12.0"
   },
   "prettier": {

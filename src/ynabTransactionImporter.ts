@@ -9,22 +9,18 @@ export class ynabTransactionImporter {
     this.password = password;
   }
 
-  public async run(accountIds: string[]) {
+  public async run() {
     // Setup
     const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
-    page.setViewport({ width: 1366, height: 768 });
+    await page.setViewport({ width: 1366, height: 768 });
 
     await this.login(page);
-    for (let accountId of accountIds) {
-      console.log(`Importing transactions for account: ${accountId}`);
-      await this.importForAccount(page, accountId);
-    }
-
+    await this.importForAllAccounts(page);
     await browser.close();
   }
 
-  private async login(page: any) {
+  private async login(page: puppeteer.Page) {
     const loginPath = "https://app.youneedabudget.com/users/login";
 
     console.log(`Logging into YNAB...`);
@@ -35,12 +31,21 @@ export class ynabTransactionImporter {
     await this.delay(10000);
   }
 
-  private async importForAccount(page: any, accountId: string) {
-    await page.click(`a[href$='${accountId}'`);
-    await this.delay(2000);
-    await page.click(".accounts-toolbar-import-transactions");
-    // Wait for import and server sync
-    await this.delay(5000);
+  private async importForAllAccounts(page: puppeteer.Page) {
+    let accountAnchors = await page.$$("a.nav-account-row");
+
+    for (const anchor of accountAnchors) {
+      await anchor.click();
+      await this.delay(2000);
+      try {
+        console.log(`Importing transactions on: ${page.url()}`);
+        await page.click(".accounts-toolbar-import-transactions");
+        // Wait for import and server sync
+        await this.delay(5000);
+      } catch (error) {
+        // We expect an error for Unlinked accounts (.accounts-toolbar-import-transactions does not exist) so just ignore them.
+      }
+    }
   }
 
   private delay(milliseconds: number) {
