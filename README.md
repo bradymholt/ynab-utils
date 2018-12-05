@@ -21,10 +21,11 @@ USAGE
 
    COMMANDS
 
-     importTransactions <email> <password> <account_ids>                  Import transactions
-     updateAmazonMemos <email> <password> <access_token> <budget_id>      Update Amazon transactions in YNAB with list of order items
-     approveTransactions <access_token> <budget_id>                       Auto-approves categorized transactions
-     help <command>                                                       Display help for a specific command
+     importTransactions                  Import transactions
+     updateAmazonMemos                   Update Amazon transactions in YNAB with list of order items
+     approveTransactions                 Auto-approves categorized transactions
+     all                                 Runs all commands
+     help <command>                      Display help for a specific command
 
    GLOBAL OPTIONS
 
