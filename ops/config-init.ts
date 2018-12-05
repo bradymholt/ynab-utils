@@ -3,9 +3,7 @@ import * as path from "path";
 import * as yaml from "js-yaml";
 import * as inquirer from "inquirer";
 
-init();
-
-function init() {
+(async function() {
   const configFile = path.join(__dirname, "config.yml");
   const templateFile = path.join(__dirname, "config.yml.example");
 
@@ -61,15 +59,13 @@ function init() {
     );
   }
 
-  (async function() {
-    const answers = await inquirer.prompt(questions);
-    config.all.vars.deploy_user = answers.deploy_user;
-    config.all.vars.gh_pubkey_user = answers.gh_pubkey_user;
-    config.production.hosts = answers.host;
-    for (let i = 0; i < config.production.vars.cron_jobs.length; i++) {
-      config.production.vars.cron_jobs[i].cron_hour = answers[`job_${i}_cron_hour`];
-      config.production.vars.cron_jobs[i].app_args = answers[`job_${i}_app_args`];
-    }
-    fs.writeFileSync(configFile, yaml.safeDump(config));
-  })();
-}
+  const answers = await inquirer.prompt(questions);
+  config.all.vars.deploy_user = answers.deploy_user;
+  config.all.vars.gh_pubkey_user = answers.gh_pubkey_user;
+  config.production.hosts = answers.host;
+  for (let i = 0; i < config.production.vars.cron_jobs.length; i++) {
+    config.production.vars.cron_jobs[i].cron_hour = answers[`job_${i}_cron_hour`];
+    config.production.vars.cron_jobs[i].app_args = answers[`job_${i}_app_args`];
+  }
+  fs.writeFileSync(configFile, yaml.safeDump(config));
+})();
