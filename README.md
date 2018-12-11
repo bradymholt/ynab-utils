@@ -24,6 +24,7 @@ USAGE
      importTransactions                  Import transactions
      updateAmazonMemos                   Update Amazon transactions in YNAB with list of order items
      approveTransactions                 Auto-approves categorized transactions
+     rollNegativeBalancesForward         Rolls negative balances from previous month forward to current month
      all                                 Runs all commands
      help <command>                      Display help for a specific command
 
