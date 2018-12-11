@@ -4,5 +4,6 @@
   "personal_access_token": "1234567890",
   "budget_id": "last-used",
   "amazon_email": "john.doe@gmail.com",
-  "amazon_password": "superSecret"
+  "amazon_password": "superSecret",
+  "balance_roller_account_id": "f03ebeff-cc58-not-real-d8c8bc8423b0"
 }
