@@ -12,22 +12,22 @@
   "license": "MIT",
   "dependencies": {
     "@types/inquirer": "0.0.43",
-    "@types/js-yaml": "^3.11.2",
-    "@types/lodash": "^4.14.119",
-    "@types/node": "^10.12.12",
-    "@types/puppeteer": "^1.11.1",
+    "@types/js-yaml": "^3.12.0",
+    "@types/lodash": "^4.14.120",
+    "@types/node": "^10.12.24",
+    "@types/puppeteer": "^1.12.1",
     "caporal": "^1.1.0",
     "lodash": "^4.17.11",
-    "moment": "^2.22.2",
-    "puppeteer": "^1.11.0",
-    "ynab": "^1.9.0",
-    "typescript": "^3.2.1",
-    "ts-node": "^7.0.1"
+    "moment": "^2.24.0",
+    "puppeteer": "^1.12.2",
+    "ynab": "^1.12.0",
+    "typescript": "^3.3.3",
+    "ts-node": "^8.0.2"
   },
   "devDependencies": {
-    "tslint": "^5.11.0",
-    "inquirer": "^6.2.1",
-    "js-yaml": "^3.12.0"
+    "tslint": "^5.12.1",
+    "inquirer": "^6.2.2",
+    "js-yaml": "^3.12.1"
   },
   "prettier": {
     "printWidth": 120
