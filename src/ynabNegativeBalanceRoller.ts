@@ -30,7 +30,7 @@ export class ynabNegativeBalanceRoller {
       )).data.transactions;
 
       const lastMonthName = this.getLastMonthName();
-      const newTransactions: Array<ynab.SaveTransaction> = [];
+      const transactionUpdates: Array<ynab.SaveTransaction> = [];
       for (let category of overspentCategories) {
         console.log(`ROLLING: ${category.name} ${category.balance}`);
 
@@ -52,13 +52,7 @@ export class ynabNegativeBalanceRoller {
           approved
         });
 
-        if (existingOutflow) {
-          await this.ynabAPI.transactions.updateTransaction(this.budgetId, existingOutflow.id, {
-            transaction: outflow
-          });
-        } else {
-          newTransactions.push(outflow);
-        }
+        transactionUpdates.push(outflow);
 
         // Bring balance into TbB category
         const existingInflow = existingBalanceRollerTransactions.find(t => t.memo == memo && t.amount > 0);
@@ -72,17 +66,11 @@ export class ynabNegativeBalanceRoller {
           approved
         });
 
-        if (existingInflow) {
-          await this.ynabAPI.transactions.updateTransaction(this.budgetId, existingInflow.id, {
-            transaction: inflow
-          });
-        } else {
-          newTransactions.push(inflow);
-        }
+        transactionUpdates.push(inflow);
       }
 
-      if (newTransactions.length > 0) {
-        await this.ynabAPI.transactions.createTransactions(this.budgetId, { transactions: newTransactions });
+      if (transactionUpdates.length > 0) {
+        await this.ynabAPI.transactions.updateTransactions(this.budgetId, { transactions: transactionUpdates });
       }
     }
   }
