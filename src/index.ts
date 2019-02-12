@@ -1,6 +1,5 @@
 import * as moment from "moment";
 import * as program from "caporal";
-import * as config from "../config.json";
 
 import { amazonMemoUpdator } from "./amazonMemoUpdator";
 import { transactionImporter } from "./transactionImporter";
@@ -16,82 +15,44 @@ export async function run() {
   console.info(`${moment().toISOString()} - STARTING UP`);
 
   program.version("1.0.0");
-  program.command("importTransactions", "Import transactions").action(async args => {
-    await importTransactions();
+  program.command("transactionImporter", "Import transactions").action(async args => {
+    await runUtil(transactionImporter);
   });
   program
-    .command("updateAmazonMemos", "Update Amazon transactions in YNAB with list of order items")
+    .command("amazonMemoUpdator", "Update Amazon transactions in YNAB with list of order items")
     .action(async args => {
-      await updateAmazonMemos();
+      await runUtil(amazonMemoUpdator);
     });
-  program.command("approveTransactions", "Auto-approves categorized transactions").action(async args => {
-    await approveTransactions();
+  program.command("transactionApprover", "Auto-approves categorized transactions").action(async args => {
+    await runUtil(transactionApprover);
   });
   program
-    .command("rollNegativeBalancesForward", "Rolls negative balances from previous month forward to current month")
+    .command("negativeBalanceRoller", "Rolls negative balances from previous month forward to current month")
     .action(async args => {
-      await rollNegativeBalancesForward();
+      await runUtil(negativeBalanceRoller);
     });
-  program.command("budgetGoals", "Budgets current month according to Goal Targets").action(async args => {
-    await budgetGoals();
+  program.command("goalBudgeter", "Budgets current month according to Goal Targets").action(async args => {
+    await runUtil(goalBudgeter);
   });
   program.command("all", "Runs all commands").action(async args => {
-    await importTransactions();
-    await updateAmazonMemos();
-    await approveTransactions();
-    await rollNegativeBalancesForward();
+    await runUtil(transactionImporter);
+    await runUtil(amazonMemoUpdator);
+    await runUtil(transactionApprover);
+    await runUtil(negativeBalanceRoller);
+    await runUtil(goalBudgeter);
     process.exit(0);
   });
 
   program.parse(process.argv);
 }
 
-async function importTransactions() {
-  console.info(`RUNNING: importTransactions`);
-  try {
-    await new transactionImporter(config.ynab_web_email, config.ynab_web_password).run();
-  } catch (error) {
-    console.log(`ERROR: ${error}`);
-  }
+interface IRunnable {
+  run(): void;
 }
-async function updateAmazonMemos() {
-  console.info(`RUNNING: updateAmazonMemos`);
+async function runUtil<T extends IRunnable>(a: { new (): T }) {
   try {
-    await new amazonMemoUpdator(
-      config.personal_access_token,
-      config.budget_id,
-      config.amazon_email,
-      config.amazon_password
-    ).run();
-  } catch (error) {
-    console.log(`ERROR: ${error}`);
-  }
-}
-async function approveTransactions() {
-  console.info(`RUNNING: approveTransactions`);
-  try {
-    await new transactionApprover(config.personal_access_token, config.budget_id).run();
-  } catch (error) {
-    console.log(`ERROR: ${error}`);
-  }
-}
-async function rollNegativeBalancesForward() {
-  console.info(`RUNNING: rollNegativeBalancesForward`);
-  try {
-    await new negativeBalanceRoller(
-      config.personal_access_token,
-      config.budget_id,
-      config.balance_roller_account_id
-    ).run();
-  } catch (error) {
-    console.log(`ERROR: ${error}`);
-  }
-}
-
-async function budgetGoals() {
-  console.info(`RUNNING: budgetGoals`);
-  try {
-    await new goalBudgeter(config.personal_access_token, config.budget_id).run();
+    console.info(`RUNNING: ${a.name}`);
+    await new a().run();
   } catch (error) {
     console.log(`ERROR: ${error}`);
   }

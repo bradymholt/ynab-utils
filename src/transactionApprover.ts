@@ -1,18 +1,17 @@
 import * as ynab from "ynab";
+import * as config from "../config.json";
 
 export class transactionApprover {
   ynabAPI: ynab.api;
-  budgetId: string;
 
-  constructor(accessToken: string, budgetId: string) {
-    this.ynabAPI = new ynab.api(accessToken);
-    this.budgetId = budgetId;
+  constructor() {
+    this.ynabAPI = new ynab.api(config.personal_access_token);
   }
 
   public async run() {
     console.log(`Fetching unapproved transaction from YNAB...`);
     const unapprovedTransactionResponse = await this.ynabAPI.transactions.getTransactions(
-      this.budgetId,
+      config.budget_id,
       undefined,
       "unapproved"
     );
@@ -25,9 +24,9 @@ export class transactionApprover {
     } else {
       for (let transaction of unapprovedCategorizedTransactions) {
         if (transaction.category_id) {
-          console.log(`APPROVING: ${transaction.date} ${transaction.payee_name} ${transaction.category_name}`);
+          console.log(`Approving: ${transaction.date} ${transaction.payee_name} ${transaction.category_name}`);
           transaction.approved = true;
-          await this.ynabAPI.transactions.updateTransaction(this.budgetId, transaction.id, {
+          await this.ynabAPI.transactions.updateTransaction(config.budget_id, transaction.id, {
             transaction
           });
         }

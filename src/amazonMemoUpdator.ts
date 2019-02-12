@@ -2,32 +2,29 @@ import * as ynab from "ynab";
 import * as moment from "moment";
 import { AmazonOrderFetcher } from "./support/amazonOrderFetcher";
 import { IAmazonItemsByAmount } from "./support/amazonOrderInfo";
+import * as config from "../config.json";
 
 export class amazonMemoUpdator {
-  ynabAPI: ynab.api;
-  budgetId: string;
-  amazonEmail: string;
-  amazonPassword: string;
+  readonly amazonOrdersSinceDaysAgo = 30;
 
-  constructor(accessToken: string, budgetId: string, amazonEmail: string, amazonPassword: string) {
-    this.ynabAPI = new ynab.api(accessToken);
-    this.budgetId = budgetId;
-    this.amazonEmail = amazonEmail;
-    this.amazonPassword = amazonPassword;
+  ynabAPI: ynab.api;
+
+  constructor() {
+    this.ynabAPI = new ynab.api(config.personal_access_token);
   }
 
-  public async run(amazonOrdersSinceDaysAgo: number = 30) {
+  public async run() {
     let fromISODate = moment()
-      .subtract(Math.abs(amazonOrdersSinceDaysAgo), "days")
+      .subtract(Math.abs(this.amazonOrdersSinceDaysAgo), "days")
       .toISOString();
     let toISODate = moment().toISOString();
 
-    const unapprovedAmazonTransactions = await this.fetchUnapprovedAmazonTransactions(this.budgetId);
+    const unapprovedAmazonTransactions = await this.fetchUnapprovedAmazonTransactions(config.budget_id);
     if (unapprovedAmazonTransactions.length) {
       console.log("At least one unapproved Amazon transaction found!");
-      const amazonOrderFetcher = new AmazonOrderFetcher(this.amazonEmail, this.amazonPassword);
+      const amazonOrderFetcher = new AmazonOrderFetcher(config.amazon_email, config.amazon_password);
       const amazonOrders = await amazonOrderFetcher.getOrders(fromISODate, toISODate);
-      await this.updateAmazonTransactionMemos(this.budgetId, unapprovedAmazonTransactions, amazonOrders);
+      await this.updateAmazonTransactionMemos(config.budget_id, unapprovedAmazonTransactions, amazonOrders);
     } else {
       console.log("No unapproved Amazon transactions found.");
     }

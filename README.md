@@ -17,24 +17,25 @@ cp ./config.json.example ./config.json
 ```
 USAGE
 
-     ynab-utils <command> [options]
+  ynab-utils <command> [options]
 
-   COMMANDS
+COMMANDS
 
-     importTransactions                  Import transactions
-     updateAmazonMemos                   Update Amazon transactions in YNAB with list of order items
-     approveTransactions                 Auto-approves categorized transactions
-     rollNegativeBalancesForward         Rolls negative balances from previous month forward to current month
-     all                                 Runs all commands
-     help <command>                      Display help for a specific command
+  transactionImporter         Import transactions                                                 
+  amazonMemoUpdator           Update Amazon transactions in YNAB with list of order items         
+  transactionApprover         Auto-approves categorized transactions                              
+  negativeBalanceRoller       Rolls negative balances from previous month forward to current month
+  goalBudgeter                Budgets current month according to Goal Targets                     
+  all                         Runs all commands                                                   
+  help <command>              Display help for a specific command                                 
 
-   GLOBAL OPTIONS
+GLOBAL OPTIONS
 
-     -h, --help         Display help
-     -V, --version      Display version
-     --no-color         Disable colors
-     --quiet            Quiet mode - only displays warn and error messages
-     -v, --verbose      Verbose mode - will also output debug messages
+  -h, --help         Display help                                      
+  -V, --version      Display version                                   
+  --no-color         Disable colors                                    
+  --quiet            Quiet mode - only displays warn and error messages
+  -v, --verbose      Verbose mode - will also output debug messages    
 ```
 
 ## Deployment

@@ -1,16 +1,13 @@
 import * as ynab from "ynab";
 import { SaveTransaction } from "ynab";
 import * as _ from "lodash";
+import * as config from "../config.json";
 
 export class negativeBalanceRoller {
   ynabAPI: ynab.api;
-  budgetId: string;
-  balanceRollerAccountId: string;
 
-  constructor(accessToken: string, budgetId: string, balanceRollerAccountId: string) {
-    this.ynabAPI = new ynab.api(accessToken);
-    this.budgetId = budgetId;
-    this.balanceRollerAccountId = balanceRollerAccountId;
+  constructor() {
+    this.ynabAPI = new ynab.api(config.personal_access_token);
   }
 
   public async run() {
@@ -19,13 +16,13 @@ export class negativeBalanceRoller {
       const lastMonthISO = this.getLastMonthInISOFormat();
       console.log(`Finding overspent categories in ${lastMonthISO.substr(0, 7)} ...`);
       const currentMonthISO = ynab.utils.getCurrentMonthInISOFormat(); // First day of the current month
-      const budgetMonthResponse = await this.ynabAPI.months.getBudgetMonth(this.budgetId, lastMonthISO);
+      const budgetMonthResponse = await this.ynabAPI.months.getBudgetMonth(config.budget_id, lastMonthISO);
       const overspentCategories = budgetMonthResponse.data.month.categories.filter(
         c => c.balance < 0 && c.name != "Uncategorized"
       );
       const existingBalanceRollerTransactions = (await this.ynabAPI.transactions.getTransactionsByAccount(
-        this.budgetId,
-        this.balanceRollerAccountId,
+        config.budget_id,
+        config.balance_roller_account_id,
         currentMonthISO
       )).data.transactions;
 
@@ -35,7 +32,7 @@ export class negativeBalanceRoller {
         console.log(`ROLLING: ${category.name} ${category.balance}`);
 
         const date = currentMonthISO;
-        const account_id = this.balanceRollerAccountId;
+        const account_id = config.balance_roller_account_id;
         const cleared = SaveTransaction.ClearedEnum.Uncleared;
         const memo = `${lastMonthName} overspending for ${category.name}`;
         const approved = true;
@@ -70,7 +67,7 @@ export class negativeBalanceRoller {
       }
 
       if (transactionUpdates.length > 0) {
-        await this.ynabAPI.transactions.updateTransactions(this.budgetId, { transactions: transactionUpdates });
+        await this.ynabAPI.transactions.updateTransactions(config.budget_id, { transactions: transactionUpdates });
       }
     }
   }
@@ -78,7 +75,7 @@ export class negativeBalanceRoller {
   private async getToBeBudgetedCategoryId() {
     console.log(`Finding the TbB category...`);
     let tbbCategoryId = null;
-    const categoriesResponse = await this.ynabAPI.categories.getCategories(this.budgetId);
+    const categoriesResponse = await this.ynabAPI.categories.getCategories(config.budget_id);
     const internalMasterCategory = categoriesResponse.data.category_groups.find(
       c => c.name == "Internal Master Category"
     );

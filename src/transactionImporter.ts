@@ -1,14 +1,7 @@
 import * as puppeteer from "puppeteer";
+import * as config from "../config.json";
 
 export class transactionImporter {
-  email: string;
-  password: string;
-
-  constructor(username: string, password: string) {
-    this.email = username;
-    this.password = password;
-  }
-
   public async run() {
     // Setup
     const browser = await puppeteer.launch({ headless: true });
@@ -25,8 +18,8 @@ export class transactionImporter {
 
     console.log(`Logging into YNAB...`);
     await page.goto(loginPath);
-    await page.type(".login-username", this.email);
-    await page.type(".login-password", this.password);
+    await page.type(".login-username", config.ynab_web_email);
+    await page.type(".login-password", config.ynab_web_password);
     await page.keyboard.press("Enter");
     await this.delay(10000);
   }
