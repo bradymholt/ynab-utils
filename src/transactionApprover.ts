@@ -1,6 +1,6 @@
 import * as ynab from "ynab";
 
-export class ynabTransactionApprover {
+export class transactionApprover {
   ynabAPI: ynab.api;
   budgetId: string;
 

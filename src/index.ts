@@ -2,10 +2,11 @@ import * as moment from "moment";
 import * as program from "caporal";
 import * as config from "../config.json";
 
-import { ynabAmazonMemoUpdator } from "./ynabAmazonMemoUpdator";
-import { ynabTransactionImporter } from "./ynabTransactionImporter";
-import { ynabTransactionApprover } from "./ynabTransactionApprover";
-import { ynabNegativeBalanceRoller } from "./ynabNegativeBalanceRoller";
+import { amazonMemoUpdator } from "./amazonMemoUpdator";
+import { transactionImporter } from "./transactionImporter";
+import { transactionApprover } from "./transactionApprover";
+import { negativeBalanceRoller } from "./negativeBalanceRoller";
+import { goalBudgeter } from "./goalBudgeter";
 
 export async function run() {
   process.on("unhandledRejection", r => {
@@ -26,8 +27,13 @@ export async function run() {
   program.command("approveTransactions", "Auto-approves categorized transactions").action(async args => {
     await approveTransactions();
   });
-  program.command("rollNegativeBalancesForward", "Rolls negative balances from previous month forward to current month").action(async args => {
-    await rollNegativeBalancesForward();
+  program
+    .command("rollNegativeBalancesForward", "Rolls negative balances from previous month forward to current month")
+    .action(async args => {
+      await rollNegativeBalancesForward();
+    });
+  program.command("budgetGoals", "Budgets current month according to Goal Targets").action(async args => {
+    await budgetGoals();
   });
   program.command("all", "Runs all commands").action(async args => {
     await importTransactions();
@@ -43,7 +49,7 @@ export async function run() {
 async function importTransactions() {
   console.info(`RUNNING: importTransactions`);
   try {
-    await new ynabTransactionImporter(config.ynab_web_email, config.ynab_web_password).run();
+    await new transactionImporter(config.ynab_web_email, config.ynab_web_password).run();
   } catch (error) {
     console.log(`ERROR: ${error}`);
   }
@@ -51,7 +57,7 @@ async function importTransactions() {
 async function updateAmazonMemos() {
   console.info(`RUNNING: updateAmazonMemos`);
   try {
-    await new ynabAmazonMemoUpdator(
+    await new amazonMemoUpdator(
       config.personal_access_token,
       config.budget_id,
       config.amazon_email,
@@ -64,7 +70,7 @@ async function updateAmazonMemos() {
 async function approveTransactions() {
   console.info(`RUNNING: approveTransactions`);
   try {
-    await new ynabTransactionApprover(config.personal_access_token, config.budget_id).run();
+    await new transactionApprover(config.personal_access_token, config.budget_id).run();
   } catch (error) {
     console.log(`ERROR: ${error}`);
   }
@@ -72,7 +78,20 @@ async function approveTransactions() {
 async function rollNegativeBalancesForward() {
   console.info(`RUNNING: rollNegativeBalancesForward`);
   try {
-    await new ynabNegativeBalanceRoller(config.personal_access_token, config.budget_id, config.balance_roller_account_id).run();
+    await new negativeBalanceRoller(
+      config.personal_access_token,
+      config.budget_id,
+      config.balance_roller_account_id
+    ).run();
+  } catch (error) {
+    console.log(`ERROR: ${error}`);
+  }
+}
+
+async function budgetGoals() {
+  console.info(`RUNNING: budgetGoals`);
+  try {
+    await new goalBudgeter(config.personal_access_token, config.budget_id).run();
   } catch (error) {
     console.log(`ERROR: ${error}`);
   }

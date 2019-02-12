@@ -1,9 +1,9 @@
 import * as ynab from "ynab";
 import * as moment from "moment";
-import { AmazonOrderFetcher } from "./amazonOrderFetcher";
-import { IAmazonItemsByAmount } from "./amazonOrderInfo";
+import { AmazonOrderFetcher } from "./support/amazonOrderFetcher";
+import { IAmazonItemsByAmount } from "./support/amazonOrderInfo";
 
-export class ynabAmazonMemoUpdator {
+export class amazonMemoUpdator {
   ynabAPI: ynab.api;
   budgetId: string;
   amazonEmail: string;

@@ -2,7 +2,7 @@ import * as ynab from "ynab";
 import { SaveTransaction } from "ynab";
 import * as _ from "lodash";
 
-export class ynabNegativeBalanceRoller {
+export class negativeBalanceRoller {
   ynabAPI: ynab.api;
   budgetId: string;
   balanceRollerAccountId: string;

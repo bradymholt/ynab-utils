@@ -1,6 +1,6 @@
 import * as puppeteer from "puppeteer";
 
-export class ynabTransactionImporter {
+export class transactionImporter {
   email: string;
   password: string;
 
