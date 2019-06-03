@@ -14,13 +14,13 @@ export class transactionImporter {
   }
 
   private async login(page: puppeteer.Page) {
-    const loginPath = "https://app.youneedabudget.com/users/login";
+    const loginPath = "https://app.youneedabudget.com/users/authentication";
 
     console.log(`Logging into YNAB...`);
     await page.goto(loginPath);
-    await page.type(".login-username", config.ynab_web_email);
-    await page.type(".login-password", config.ynab_web_password);
-    await page.keyboard.press("Enter");
+    await page.type("#request_data_email", config.ynab_web_email);
+    await page.type("#request_data_password", config.ynab_web_password);
+    await page.click("#login");
     await this.delay(10000);
   }
 
