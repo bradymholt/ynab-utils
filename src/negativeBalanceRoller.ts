@@ -1,6 +1,7 @@
 import * as ynab from "ynab";
 import { SaveTransaction } from "ynab";
 import * as _ from "lodash";
+import * as moment from "moment";
 import * as config from "../config.json";
 
 export class negativeBalanceRoller {
@@ -13,7 +14,10 @@ export class negativeBalanceRoller {
   public async run() {
     const toBeBudgetedCategoryId = await this.getToBeBudgetedCategoryId();
     if (toBeBudgetedCategoryId) {
-      const lastMonthISO = this.getLastMonthInISOFormat();
+      const lastMonthISO = moment()
+        .subtract(1, "month")
+        .startOf("month")
+        .format("YYYY-MM-DD");
       console.log(`Finding overspent categories in ${lastMonthISO.substr(0, 7)} ...`);
       const currentMonthISO = ynab.utils.getCurrentMonthInISOFormat(); // First day of the current month
       const budgetMonthResponse = await this.ynabAPI.months.getBudgetMonth(config.budget_id, lastMonthISO);
@@ -26,7 +30,10 @@ export class negativeBalanceRoller {
         currentMonthISO
       )).data.transactions;
 
-      const lastMonthName = this.getLastMonthName();
+      const lastMonthName = moment()
+        .subtract(1, "month")
+        .startOf("month")
+        .format("MMMM");
       const transactionUpdates: Array<ynab.SaveTransaction> = [];
       for (let category of overspentCategories) {
         console.log(`ROLLING: ${category.name} ${category.balance}`);
@@ -87,23 +94,5 @@ export class negativeBalanceRoller {
     }
 
     return tbbCategoryId;
-  }
-
-  private getLastMonthInISOFormat() {
-    let currentDate = new Date();
-    let lastDateAsMilliseconds = currentDate.setMonth(currentDate.getMonth() - 1);
-    let isoLocalDateString = new Date(lastDateAsMilliseconds - currentDate.getTimezoneOffset() * 60000).toISOString();
-    let lastMonthInISOFormat = `${isoLocalDateString.substr(0, 7)}-01`;
-    return lastMonthInISOFormat;
-  }
-
-  private getLastMonthName() {
-    let currentDate = new Date();
-    let lastMonthDate = new Date(currentDate.setMonth(currentDate.getMonth() - 1));
-    let locale = "en-us";
-    let month = lastMonthDate.toLocaleString(locale, {
-      month: "long"
-    });
-    return month;
   }
 }
