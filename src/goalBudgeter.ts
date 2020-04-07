@@ -18,17 +18,19 @@ export class goalBudgeter {
 
     if (currentMonthData.to_be_budgeted >= this.skipIfTbBLessThan) {
       for (let category of currentMonthData.categories) {
-        if (category.goal_target > 0 && category.budgeted == 0) {
+        if ((category.goal_target || 0) > 0 && category.budgeted == 0) {
           console.log(`Budgeting: ${category.goal_target} to ${category.name}`);
           await this.ynabAPI.categories.updateMonthCategory(config.budget_id, month, category.id, {
-            category: {
-              budgeted: category.goal_target
-            }
+            category: <ynab.SaveMonthCategory>{
+              budgeted: category.goal_target,
+            },
           });
         }
       }
     } else {
-      console.log(`Skipping because TbB of ${currentMonthData.to_be_budgeted} was less than ${this.skipIfTbBLessThan}.`);
+      console.log(
+        `Skipping because TbB of ${currentMonthData.to_be_budgeted} was less than ${this.skipIfTbBLessThan}.`
+      );
     }
   }
 }

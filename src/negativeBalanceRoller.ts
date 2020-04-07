@@ -14,27 +14,23 @@ export class negativeBalanceRoller {
   public async run() {
     const toBeBudgetedCategoryId = await this.getToBeBudgetedCategoryId();
     if (toBeBudgetedCategoryId) {
-      const lastMonthISO = moment()
-        .subtract(1, "month")
-        .startOf("month")
-        .format("YYYY-MM-DD");
+      const lastMonthISO = moment().subtract(1, "month").startOf("month").format("YYYY-MM-DD");
       console.log(`Finding overspent categories in ${lastMonthISO.substr(0, 7)} ...`);
       const currentMonthISO = ynab.utils.getCurrentMonthInISOFormat(); // First day of the current month
       const budgetMonthResponse = await this.ynabAPI.months.getBudgetMonth(config.budget_id, lastMonthISO);
       const overspentCategories = budgetMonthResponse.data.month.categories.filter(
-        c => c.balance < 0 && c.name != "Uncategorized"
+        (c) => c.balance < 0 && c.name != "Uncategorized"
       );
-      const existingBalanceRollerTransactions = (await this.ynabAPI.transactions.getTransactionsByAccount(
-        config.budget_id,
-        config.balance_roller_account_id,
-        currentMonthISO
-      )).data.transactions;
+      const existingBalanceRollerTransactions = (
+        await this.ynabAPI.transactions.getTransactionsByAccount(
+          config.budget_id,
+          config.balance_roller_account_id,
+          currentMonthISO
+        )
+      ).data.transactions;
 
-      const lastMonthName = moment()
-        .subtract(1, "month")
-        .startOf("month")
-        .format("MMMM");
-      const transactionUpdates: Array<ynab.SaveTransaction> = [];
+      const lastMonthName = moment().subtract(1, "month").startOf("month").format("MMMM");
+      const transactionUpdates: Array<ynab.UpdateTransaction> = [];
       for (let category of overspentCategories) {
         console.log(`ROLLING: ${category.name} ${category.balance}`);
 
@@ -45,7 +41,7 @@ export class negativeBalanceRoller {
         const approved = true;
 
         // Send balance out of category in current month
-        const existingOutflow = existingBalanceRollerTransactions.find(t => t.memo == memo && t.amount < 0);
+        const existingOutflow = existingBalanceRollerTransactions.find((t) => t.memo == memo && t.amount < 0);
         const outflow = Object.assign(existingOutflow || {}, {
           date,
           account_id,
@@ -53,13 +49,13 @@ export class negativeBalanceRoller {
           amount: category.balance,
           cleared,
           memo,
-          approved
-        });
+          approved,
+        }) as ynab.TransactionDetail;
 
         transactionUpdates.push(outflow);
 
         // Bring balance into TbB category
-        const existingInflow = existingBalanceRollerTransactions.find(t => t.memo == memo && t.amount > 0);
+        const existingInflow = existingBalanceRollerTransactions.find((t) => t.memo == memo && t.amount > 0);
         const inflow = Object.assign(existingInflow || {}, {
           date,
           account_id,
@@ -67,8 +63,8 @@ export class negativeBalanceRoller {
           amount: -category.balance,
           cleared,
           memo,
-          approved
-        });
+          approved,
+        }) as ynab.TransactionDetail;
 
         transactionUpdates.push(inflow);
       }
@@ -84,10 +80,10 @@ export class negativeBalanceRoller {
     let tbbCategoryId = null;
     const categoriesResponse = await this.ynabAPI.categories.getCategories(config.budget_id);
     const internalMasterCategory = categoriesResponse.data.category_groups.find(
-      c => c.name == "Internal Master Category"
+      (c) => c.name == "Internal Master Category"
     );
     if (internalMasterCategory) {
-      const toBeBudgetedCategory = internalMasterCategory.categories.find(c => c.name == "To be Budgeted");
+      const toBeBudgetedCategory = internalMasterCategory.categories.find((c) => c.name == "To be Budgeted");
       if (toBeBudgetedCategory) {
         tbbCategoryId = toBeBudgetedCategory.id;
       }
