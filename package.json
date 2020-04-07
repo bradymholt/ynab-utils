@@ -17,7 +17,7 @@
     "@types/node": "^10.12.24",
     "@types/puppeteer": "^1.12.1",
     "caporal": "^1.1.0",
-    "lodash": "^4.17.11",
+    "lodash": "^4.17.13",
     "moment": "^2.24.0",
     "puppeteer": "^1.12.2",
     "ynab": "^1.12.0",
