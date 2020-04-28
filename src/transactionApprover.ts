@@ -17,20 +17,22 @@ export class transactionApprover {
     );
 
     const unapprovedCategorizedTransactions = unapprovedTransactionResponse.data.transactions.filter(
-      t => t.category_id != null
+      (t) => t.category_id != null
     );
     if (unapprovedCategorizedTransactions.length == 0) {
       console.log(`No unapproved categorized transactions to approve!`);
     } else {
-      for (let transaction of unapprovedCategorizedTransactions) {
-        if (transaction.category_id) {
-          console.log(`Approving: ${transaction.date} ${transaction.payee_name} ${transaction.category_name}`);
-          transaction.approved = true;
-          await this.ynabAPI.transactions.updateTransaction(config.budget_id, transaction.id, {
-            transaction
-          });
-        }
-      }
+      const toApproveListForDisplay = unapprovedCategorizedTransactions.map(
+        (t) => ` ${t.date} ${t.payee_name} ${t.category_name}`
+      );
+
+      console.log(`Approving these transactions:\n${toApproveListForDisplay.join("\n")}`);
+
+      unapprovedCategorizedTransactions.forEach((t) => (t.approved = true));
+      const approvedTransactions = unapprovedCategorizedTransactions;
+      await this.ynabAPI.transactions.updateTransactions(config.budget_id, {
+        transactions: approvedTransactions,
+      });
     }
   }
 }
