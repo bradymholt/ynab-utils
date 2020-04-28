@@ -1,5 +1,5 @@
 import * as ynab from "ynab";
-import * as config from "../config.json";
+import config from "../config.json";
 
 export class goalBudgeter {
   ynabAPI: ynab.api;

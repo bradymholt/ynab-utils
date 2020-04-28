@@ -1,8 +1,8 @@
 import * as ynab from "ynab";
-import * as moment from "moment";
+import moment from "moment";
 import { AmazonOrderFetcher } from "./support/amazonOrderFetcher";
 import { IAmazonItemsByAmount } from "./support/amazonOrderInfo";
-import * as config from "../config.json";
+import config from "../config.json";
 
 export class amazonMemoUpdator {
   readonly amazonOrdersSinceDaysAgo = 30;

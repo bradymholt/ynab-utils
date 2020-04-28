@@ -1,8 +1,8 @@
 import * as ynab from "ynab";
 import { SaveTransaction } from "ynab";
-import * as _ from "lodash";
-import * as moment from "moment";
-import * as config from "../config.json";
+import _ from "lodash";
+import moment from "moment";
+import config from "../config.json";
 
 export class negativeBalanceRoller {
   ynabAPI: ynab.api;

@@ -1,5 +1,5 @@
-import * as moment from "moment";
-import * as program from "caporal";
+import moment from "moment";
+import program from "caporal";
 
 import { amazonMemoUpdator } from "./amazonMemoUpdator";
 import { transactionImporter } from "./transactionImporter";

@@ -1,7 +1,7 @@
-import * as puppeteer from "puppeteer";
-import * as fs from "fs";
-import * as path from "path";
-import * as _ from "lodash";
+import puppeteer from "puppeteer";
+import fs from "fs";
+import path from "path";
+import _ from "lodash";
 import { IAmazonOrderItem, IAmazonOrder, IAmazonItemsByAmount } from "./amazonOrderInfo";
 
 enum AmazonOrderReportTypeEmum {
